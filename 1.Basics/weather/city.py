@@ -4,7 +4,7 @@ import requests
 from dateutil.parser import parse
 
 
-class YahooWeatherForecast:
+class OpenWeatherMap:
 
     #def __init__(self):
     #    self._city_cache = {}
@@ -12,19 +12,17 @@ class YahooWeatherForecast:
     def get(self, city):
         #if city in self._cached_data:
         #     return self._cached_data[city]
-        lat = 55.75
-        lon = 37.62
         api_key = '' #personal key.
-        url = f"https://api.openweathermap.org/data/2.5/weather?q=London&APPID={api_key}"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&APPID={api_key}"
         data = requests.get(url).json()
         forecast = []
-        print(data)
-        forecast_data = data["main"]
-        for day_data in forecast_data:
-            forecast.append({
-              # "date": parse(day_data["time"]),
-                "high_temp": int(day_data["temp_max"])
-            })
+      #  print(data)
+
+        forecast.append({"City": data['name']})
+        forecast.append({"high_temp": data['main']['temp_min']})
+        forecast.append({"high_temp": data['main']['temp_max']})
+        
+          
         #self._cached_data[city] = forecast
         return forecast
 
@@ -32,14 +30,14 @@ class YahooWeatherForecast:
 class CityInfo:
     def __init__(self, city, forecast_provider=None):
         self.city = city.lower()
-        self._forecast_provider = forecast_provider or YahooWeatherForecast()
+        self._forecast_provider = forecast_provider or OpenWeatherMap()
 
     def weather_forecast(self):
         return self._forecast_provider.get(self.city)
 
 
 def _main():
-    city = CityInfo(sys.argv[1]) # latitude longitude .
+    city = CityInfo(sys.argv[1]) # input Moscow, London etc...
     forecast = city.weather_forecast()
     pprint.pprint(forecast)
 
