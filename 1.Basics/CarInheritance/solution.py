@@ -39,7 +39,7 @@ class Car(CarBase):
         super().__init__(brand, photo_file_name, carrying)
         self.car_type = "car"
         self.passenger_seats_count = int(passenger_seats_count)
-        
+
 
 class Truck(CarBase):
     def __init__(self, brand, photo_file_name, carrying, body_whl):
@@ -71,8 +71,7 @@ class SpecMachine(CarBase):
 def CheckCommonAttribute(row):
     possible_technics = ['car', 'truck', 'spec_machine']
     possibe_img_extansions = ['.png', '.jpg', '.jpeg', '.gif']
-    
-    
+
     if len(row) != 7 \
             or row["car_type"] not in possible_technics \
             or not isinstance(row["brand"], str) \
@@ -100,7 +99,7 @@ def ParseTruck(row):
 
 def ParseSpecMachine(row):
     if row["passenger_seats_count"] or row["body_whl"] \
-        or(len(row["extra"]) == 0):
+            or (len(row["extra"]) == 0):
         return
     return SpecMachine(row["brand"], row["photo_file_name"], row["carrying"], row["extra"])
 
@@ -132,7 +131,7 @@ def get_car_list(csv_filename):
     return ParseFile(csv_filename)
 
 
-#def main():
+# def main():
 
 #     truck = Truck('Nissan', 't1.jpg', '2.5', 'WxHxl')
 #     print(truck.car_type, truck.brand, truck.photo_file_name,
