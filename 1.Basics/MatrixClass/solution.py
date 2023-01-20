@@ -18,7 +18,11 @@ class Matrix:
         self._matrix[idx] = element
         # определяем размер матрицы
         size = int(len(self._matrix) ** 0.5)
+       
+        
+        #print("size", len(self._matrix))
         # проверяем нужно ли увеличивать размер матрицы
+
         if idx == size * (size - 1):
         # увеличиваем размер матрицы
             self._matrix.extend([None, ] * ((size + 1) ** 2 - len(self._matrix)))
@@ -26,14 +30,15 @@ class Matrix:
         # return matrix
 
     def pop(self):
-        pass
+        pass # 1. найди индекс 2. сделать квадрантную матрицу меньше на одну сторону и столбец.
+   
 
     def __str__(self):
         result = ''
         size = int(len(self._matrix) ** 0.5)
         for row in range(size):
             result += ' '.join([str(i) for i in self._matrix[size * row:size * (row + 1)]]) + '\n'
-        return result #check last space
+        return result #check last space later
         
 
     @classmethod
@@ -45,7 +50,7 @@ def main():
     print(type(matrix))
     print(matrix)
     
-    for i in range(1, 4):
+    for i in range(1, 14):
         matrix.append(i)
         print(matrix)
         print('*' * 10)
