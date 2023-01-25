@@ -2,26 +2,26 @@ class Matrix:
     MAX_SIZE = 1000
 
     def __init__(self, max_size=None):
-        self.MAX_SIZE = max_size or self.MAX_SIZE 
+        self.MAX_SIZE = max_size or self.MAX_SIZE
         self._matrix = [None for _ in range(1)]
 
     def append(self, element=None):
-        if element is None:  
+        if element is None:
             return
         try:
             idx = self._matrix.index(None)
         except:
             raise IndexError
-        
-        self._matrix[idx] = element   
-        size = int(len(self._matrix) ** 0.5) 
+
+        self._matrix[idx] = element
+        size = int(len(self._matrix) ** 0.5)
 
         if size < self.MAX_SIZE and idx == size * (size - 1):
             self._matrix.extend(
                 [None, ] * ((size + 1) ** 2 - len(self._matrix)))
 
     def pop(self):
-        if len(self._matrix) == 1: 
+        if len(self._matrix) == 1:
             raise IndexError
         try:
             idx = self._matrix.index(None) - 1
@@ -49,13 +49,9 @@ class Matrix:
     @classmethod
     def from_iter(cls, iter_obj, max_size=None):
         matrix = Matrix(max_size)
-        try:
-            lst = [i for i in iter_obj if i != None]
-            for i in lst:
-                matrix.append(i)
-        except IndexError:
-            raise IndexError
-        except TypeError:
-            raise TypeError
+
+        lst = [i for i in iter_obj if i != None]
+        for i in lst:
+            matrix.append(i)
 
         return matrix
