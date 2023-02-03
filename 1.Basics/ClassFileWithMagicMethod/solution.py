@@ -35,6 +35,9 @@ class File:
                 if num_line == self.iter_count:
                     self.iter_count += 1
                     return line
+                
+    def __str__(self):
+        return os.path.join(base_path, self.pathname)
 
     def read(self):
         with open(os.path.join(base_path, self.pathname), 'r') as file:
@@ -66,6 +69,10 @@ def main():
     print(new_file_obj)
     for line in new_file_obj:
         print(ascii(line))
-
+        
+    new_path_to_file = str(new_file_obj)
+    print(os.path.exists(new_path_to_file))
+    file_obj_3 = File(new_path_to_file)
+    print(file_obj_3)
 
 main()
