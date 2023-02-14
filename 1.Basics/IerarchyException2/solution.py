@@ -22,7 +22,6 @@ class NotExistingExtensionError(BookIOErrors):
 
 class Person:
     """класс описывающий человека"""
-
     def __init__(self, name):
         self.name = name
 
