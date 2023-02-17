@@ -54,7 +54,6 @@ class Page:
 
 class Book:
     """класс книга"""
-
     def __init__(self, title, content=None):
         self.title = title
         self._content = [] if content is None else content
@@ -82,8 +81,6 @@ class Book:
         return len(self._content) >= len(other._content)
     
                 
-        
-    
 # def main():
 #     page = Page('text')
 #     page += '_new_text'
