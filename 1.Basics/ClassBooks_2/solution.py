@@ -35,9 +35,9 @@ class Page:
     def __add__(self, other):
         if not isinstance(other, str) and not isinstance(other, Page):
             raise TypeError
-        if (len(self._text + other) > self.max_sign):
+        if len(self._text  +  other) > self.max_sign:
             raise TooLongTextError
-
+       
         self._text += other
         return self
 
@@ -90,6 +90,17 @@ class Book:
 class CalendarBookmark:
     """класс дескриптор - закладка для ежедневника"""
 
+    page_number = 0
+
+    def __set__(self, obj, value):
+        if (value <= 0 or value > len(obj._content)) :
+            raise PageNotFoundError
+        
+        self.page_number = value
+
+    def __get__(self, obj, obj_type):
+        return self.page_number
+    
 
 class CalendarBook(Book):
     """класс книги - ежедневник с закладкой"""
@@ -101,32 +112,44 @@ class CalendarBook(Book):
 
         all_calendar_dates = []
         for i in range(1, 13):
-            all_calendar_dates.append(tc.formatmonth(int(title), i))
+            all_calendar_dates.append(Page(str(tc.formatmonth(int(title), i))))
 
             main_list = tc.itermonthdates(int(title), i)
 
             for date_ in list(main_list):
                 if date_.month == i:
-                    all_calendar_dates.append(date_)
+                    all_calendar_dates.append(Page(str(date_)))
 
         super().__init__(title, all_calendar_dates)
 
 
-def main():
+# def main():
+    
+#     book = CalendarBook('2018')
+#     print(len(book))
+#     print(book.title)
+#     print(book[1])
+#     print(book[2])
+#     print(book[32])
+#     print(book[33])
+#     # print(book[0])
+#     print(book.bookmark)
+#     book.bookmark = 7
+#     print(book.bookmark)
+#     book[2] += '\nHappy New Year!!!'
+#     print(book[2])
+#   #  book.bookmark = 0
+#    # print(len(book))
+#   #  book.bookmark = 377
+#     # print(book.bookmark)
+#     # book.bookmark = 378
+    
+    
 
-    book = CalendarBook('2018')
-    print(len(book))
-    print(book.title)
-    print(book[1])
-    print(book[2])
-    print(book[32])
-    print(book[33])
-    print(book[0])
 
+# main()
 
-main()
-
-# tc= calendar.TextCalendar(firstweekday=0)
+# # tc= calendar.TextCalendar(firstweekday=0)
 # print(tc.formatmonth(2018, 1))
 # days = (tc.itermonthdates(2018, 1))
 # for i in list(days):
