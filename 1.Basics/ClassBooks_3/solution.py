@@ -103,7 +103,76 @@ class CalendarBookmark:
         return self.page_number
 
 
-class PageTableContents(Page):  # страница оглавления.
+class Person:
+    """класс описывающий человека"""
+
+    def __init__(self, name):
+        self.name = name
+
+    def set_bookmark(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def get_bookmark(self, *args, **kwargs):
+        raise NotImplementedError
+
+    def del_bookmark(self, *args, **kwargs):
+        raise NotImplementedError
+
+
+class Reader:
+    def read(self, book, num_page):
+        if num_page < 0 or num_page >= len(book._content):
+            raise PageNotFoundError
+        return book._content[num_page-1]
+
+
+class Writer:
+    def write(self, book, num_page, text):
+        if num_page < 0 or num_page >= len(book._content):
+            raise PageNotFoundError
+        if len(book._content[num_page-1]) + len(text) > book._content[num_page].max_sign:
+            raise TooLongTextError
+        book._content[num_page-1] +=text
+
+
+class AdvancedPerson(Person, Reader, Writer):
+    """класс человека умеющего читать, писать, пользоваться закладками"""
+
+    def set_bookmark(self, book, num_page):
+        if hasattr(book, 'set_bookmark'):
+            book.set_bookmark(self, num_page)
+            return
+        raise NotExistingExtensionError
+
+    def get_bookmark(self, book):
+        if hasattr(book, 'get_bookmark'):
+            return book.get_bookmark(self)
+        raise NotExistingExtensionError
+
+    def del_bookmark(self, book, person):
+        if hasattr(book, 'get_bookmark'):
+            book.del_bookmark(self)
+            return
+        raise NotExistingExtensionError
+
+    def search(self, book, page):
+        last_page = book[len(book)]
+        if page not in last_page._table:
+            raise PageNotFoundError
+        return last_page._table[page]
+        
+
+    def read(self, book, page):
+        if isinstance(page, str):
+            return Reader().read(book, self.search(book, page)-1)
+        return Reader().read(book, page-1)
+
+    def write(self, book, page, text):
+        if isinstance(page, str):
+            Writer().write(book, self.search(book, page)-1, text)
+        Writer().write(book, page-1, text)
+
+class PageTableContents(Page):
     _table = OrderedDict()
     _start = 'TABLE OF CONTENT\n'
 
@@ -118,11 +187,18 @@ class PageTableContents(Page):  # страница оглавления.
         return self._table[chapter]
 
     def __str__(self):
-        line = self._start
-        for key, value in self._table.items():
-            line += str(key) + ':' + str(value) + '\n'
+        line = ''
+        if isinstance(self._table, str) :   
+            line += self._table
+        else:
+            line = self._start
+            for key, value in self._table.items():
+                line += str(key) + ':' + str(value) + '\n'
+                
         return line
-
+    
+    def __add__(self, other):
+        raise PermissionDeniedError
 
 class CalendarBook(Book):
     """класс книги - ежедневник с закладкой"""
@@ -154,14 +230,46 @@ class CalendarBook(Book):
 
 def main():
     note = CalendarBook('2018')
+    print(note[1])
+    print(note[2])
     print(len(note))
     print(note[378])
-
     print(note[378].search('August'))
-    # print(note[400])
-    # print(note['August']) # check later
-
-
+  #  print(note[400]) #pagenotfounderror
+  #  print(note['August']) #typeerror # check late
+   
+    person = AdvancedPerson('Adam') 
+    print(person.search(note, 'May'))
+    
+    print(person.read(note, 125))
+    person.write(note, 2, '\nHappy New Year!!!')  
+    print(note[2])
+    #person.write(note, 2, 'too_long_string' * 1000) #toolongtexterror
+    text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
+    
+    page = PageTableContents(text, 300)
+    print(page)
+    content = [Page('page 1'), Page('page 2'), Page('page 3'), Page('page 4'), Page('page 5')]
+    book = Book('title', content)
+    reader = Reader()
+    page = reader.read(book, 1)
+    print(str(page))    
+    
+    # book = CalendarBook('1980')
+    # person = AdvancedPerson('Sasha')
+    # print(person.read(book, 'January'))
+    
+    # content = [Page('num: {}.'.format(str(num))) for num in range(1 ,11)]
+    # book = Book('title', content)
+    # print('содержимое страницы до добавления: ', book[1], sep ='\n')
+    # writer = Writer()
+    # writer.write(book, 1, 'some_text')
+    # print('Содержимое страницы после добавления:', book[1], sep='\n')
+    
+   # text = 'TABLE OF CONTENT\nJanuary:1\n'
+  #  page = PageTableContents(text, 300)
+ #   page += "some_string"
+    
 main()
 
 # # tc= calendar.TextCalendar(firstweekday=0)
