@@ -121,14 +121,14 @@ class Person:
 
 class Reader:
     def read(self, book, num_page):
-        if num_page < 0 or num_page >= len(book._content):
+        if num_page < 1 or num_page >= len(book._content):
             raise PageNotFoundError
         return book._content[num_page-1]
 
 
 class Writer:
     def write(self, book, num_page, text):
-        if num_page < 0 or num_page >= len(book._content):
+        if num_page <=  0 or num_page >= len(book._content):
             raise PageNotFoundError
         if len(book._content[num_page-1]) + len(text) > book._content[num_page].max_sign:
             raise TooLongTextError
@@ -164,34 +164,46 @@ class AdvancedPerson(Person, Reader, Writer):
 
     def read(self, book, page):
         if isinstance(page, str):
-            return Reader().read(book, self.search(book, page)-1)
-        return Reader().read(book, page-1)
+            return Reader().read(book, self.search(book, page))
+        return Reader().read(book, page)
 
     def write(self, book, page, text):
         if isinstance(page, str):
-            Writer().write(book, self.search(book, page)-1, text)
-        Writer().write(book, page-1, text)
+            Writer().write(book, self.search(book, page), text)
+        Writer().write(book, page, text)
 
 class PageTableContents(Page):
-    _table = OrderedDict()
     _start = 'TABLE OF CONTENT\n'
 
     def __init__(self, text=None, max_sign=2000):
-        if text is not None:
+        self._table = OrderedDict()
+        
+        if isinstance(text, str):
+            if text.startswith('TABLE OF CONTENT\n'):
+                text = "\n".join(text.split("\n")[1:])
+                for line in text.split('\n'):
+                    keyvalue = line.split(':')
+                    if len(keyvalue[0]) != 0:
+                        self._table[keyvalue[0]] = keyvalue[1]
+        else:                   
             self._table = text
-            super().__init__(str(self._table))
+        super().__init__(self._table, max_sign)
 
-    def search(self, chapter):
+    def search(self, chapter):           
         if chapter not in self._table:
             raise PageNotFoundError
-        return self._table[chapter]
+     
+        return int(self._table[chapter])
 
     def __str__(self):
         line = ''
+        if self._table is None:
+            return str('TABLE OF CONTENT\n')
         if isinstance(self._table, str) :   
             line += self._table
         else:
             line = self._start
+            
             for key, value in self._table.items():
                 line += str(key) + ':' + str(value) + '\n'
                 
@@ -228,53 +240,62 @@ class CalendarBook(Book):
         super().__init__(title, all_calendar_dates)
 
 
-def main():
-    note = CalendarBook('2018')
-    print(note[1])
-    print(note[2])
-    print(len(note))
-    print(note[378])
-    print(note[378].search('August'))
-  #  print(note[400]) #pagenotfounderror
-  #  print(note['August']) #typeerror # check late
+# def main():
+#     note = CalendarBook('2018')
+#     print(note[1])
+#     print(note[2])
+#     print(len(note))
+#     print(note[378])
+#     print(note[378].search('August'))
+#   #  print(note[400]) #pagenotfounderror
+#   #  print(note['August']) #typeerror # check late
    
-    person = AdvancedPerson('Adam') 
-    print(person.search(note, 'May'))
+#     person = AdvancedPerson('Adam') 
+#     print(person.search(note, 'May'))
     
-    print(person.read(note, 125))
-    person.write(note, 2, '\nHappy New Year!!!')  
-    print(note[2])
-    #person.write(note, 2, 'too_long_string' * 1000) #toolongtexterror
-    text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
     
-    page = PageTableContents(text, 300)
-    print(page)
-    content = [Page('page 1'), Page('page 2'), Page('page 3'), Page('page 4'), Page('page 5')]
-    book = Book('title', content)
-    reader = Reader()
-    page = reader.read(book, 1)
-    print(str(page))    
+#     print(person.read(note, 125))
+#     person.write(note, 2, '\nHappy New Year!!!')  
+#     print(note[2])
+#     #person.write(note, 2, 'too_long_string' * 1000)# tooLongTextError
+#     text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
+#     page = PageTableContents(text, 300)
+#     print(page)
+#     content = [Page('page 1'), Page('page 2'), Page('page 3'), Page('page 4'), Page('page 5')]
+#     book = Book('title', content)
+#     reader = Reader()
+#     page = reader.read(book, 1)
+#     print(str(page))  
     
-    # book = CalendarBook('1980')
-    # person = AdvancedPerson('Sasha')
-    # print(person.read(book, 'January'))
+#     content = [Page('num: {}.'.format(str(num))) for num in range(1 ,11)]
+#     book = Book('title', content)
+#     print('содержимое страницы до добавления: ', book[1], sep ='\n')
+#     writer = Writer()
+#     writer.write(book, 1, 'some_text')
+#     print('Содержимое страницы после добавления:', book[1], sep='\n')
     
-    # content = [Page('num: {}.'.format(str(num))) for num in range(1 ,11)]
-    # book = Book('title', content)
-    # print('содержимое страницы до добавления: ', book[1], sep ='\n')
-    # writer = Writer()
-    # writer.write(book, 1, 'some_text')
-    # print('Содержимое страницы после добавления:', book[1], sep='\n')
+#     # #person.write(note, 2, 'too_long_string' * 1000) #toolongtexterror
+   
+#     text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
+#     page = PageTableContents(text, 300)
+#     print(page)
+#     print(page.search('February'))
+  
     
-   # text = 'TABLE OF CONTENT\nJanuary:1\n'
-  #  page = PageTableContents(text, 300)
- #   page += "some_string"
+#     book = CalendarBook('1980')
+#     person = AdvancedPerson('Sasha')
+#     print(person.read(book, 'January'))
     
-main()
+    
+#     # text = 'TABLE OF CONTENT\nJanuary:1\n'
+#     # page = PageTableContents(text, 300)
+#     # page += "some_string"
+    
+# main()
 
-# # tc= calendar.TextCalendar(firstweekday=0)
-# print(tc.formatmonth(2018, 1))
-# days = (tc.itermonthdates(2018, 1))
-# for i in list(days):
-#     if i.month == 1:
-#         print(i)
+# # # tc= calendar.TextCalendar(firstweekday=0)
+# # print(tc.formatmonth(2018, 1))
+# # days = (tc.itermonthdates(2018, 1))
+# # for i in list(days):
+# #     if i.month == 1:
+# #         print(i)
