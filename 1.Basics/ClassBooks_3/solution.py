@@ -156,7 +156,11 @@ class AdvancedPerson(Person, Reader, Writer):
         raise NotExistingExtensionError
 
     def search(self, book, page):
-        last_page = book[len(book)]
+        last_page = book[len(book)] 
+        
+        if not isinstance(last_page, PageTableContents):
+            raise NotExistingExtensionError
+        
         if page not in last_page._table:
             raise PageNotFoundError
         return last_page._table[page]
@@ -177,6 +181,7 @@ class PageTableContents(Page):
 
     def __init__(self, text=None, max_sign=2000):
         self._table = OrderedDict()
+        self._text = text
         
         if isinstance(text, str):
             if text.startswith('TABLE OF CONTENT\n'):
@@ -187,7 +192,9 @@ class PageTableContents(Page):
                         self._table[keyvalue[0]] = keyvalue[1]
         else:                   
             self._table = text
-        super().__init__(self._table, max_sign)
+
+        
+        super().__init__(self._text, max_sign)
 
     def search(self, chapter):           
         if chapter not in self._table:
@@ -199,6 +206,7 @@ class PageTableContents(Page):
         line = ''
         if self._table is None:
             return str('TABLE OF CONTENT\n')
+        
         if isinstance(self._table, str) :   
             line += self._table
         else:
@@ -210,6 +218,11 @@ class PageTableContents(Page):
         return line
     
     def __add__(self, other):
+        raise PermissionDeniedError
+    def __radd__(self, other):
+        raise PermissionDeniedError
+
+    def __iadd__(self, other):
         raise PermissionDeniedError
 
 class CalendarBook(Book):
@@ -240,58 +253,67 @@ class CalendarBook(Book):
         super().__init__(title, all_calendar_dates)
 
 
-# def main():
-#     note = CalendarBook('2018')
-#     print(note[1])
-#     print(note[2])
-#     print(len(note))
-#     print(note[378])
-#     print(note[378].search('August'))
-#   #  print(note[400]) #pagenotfounderror
-#   #  print(note['August']) #typeerror # check late
+def main():
+    
+    note = CalendarBook('2018')
+    print(note[1])
+    print(note[2])
+    print(len(note))
+    print(note[378])
+    print(note[378].search('August'))
+  #  print(note[400]) #pagenotfounderror
+  #  print(note['August']) #typeerror # check late
    
-#     person = AdvancedPerson('Adam') 
-#     print(person.search(note, 'May'))
+    person = AdvancedPerson('Adam') 
+    print(person.search(note, 'May'))
     
     
-#     print(person.read(note, 125))
-#     person.write(note, 2, '\nHappy New Year!!!')  
-#     print(note[2])
-#     #person.write(note, 2, 'too_long_string' * 1000)# tooLongTextError
-#     text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
-#     page = PageTableContents(text, 300)
-#     print(page)
-#     content = [Page('page 1'), Page('page 2'), Page('page 3'), Page('page 4'), Page('page 5')]
-#     book = Book('title', content)
-#     reader = Reader()
-#     page = reader.read(book, 1)
-#     print(str(page))  
+    print(person.read(note, 125))
+    person.write(note, 2, '\nHappy New Year!!!')  
+    print(note[2])
+    #person.write(note, 2, 'too_long_string' * 1000)# tooLongTextError
+    text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
+    print(len(text))
+    page = PageTableContents(text, 300)
+    print(len(page))
     
-#     content = [Page('num: {}.'.format(str(num))) for num in range(1 ,11)]
-#     book = Book('title', content)
-#     print('содержимое страницы до добавления: ', book[1], sep ='\n')
-#     writer = Writer()
-#     writer.write(book, 1, 'some_text')
-#     print('Содержимое страницы после добавления:', book[1], sep='\n')
+    page1 = Page('text')
+    print(len(page1))
+    print(page)
+    content = [Page('page 1'), Page('page 2'), Page('page 3'), Page('page 4'), Page('page 5')]
+    book = Book('title', content)
+    reader = Reader()
+    page = reader.read(book, 1)
+    print(str(page))  
     
-#     # #person.write(note, 2, 'too_long_string' * 1000) #toolongtexterror
+    content = [Page('num: {}.'.format(str(num))) for num in range(1 ,11)]
+  #  book = Book('title', content)
+  #  person.search(book, 'January')
+    
+    print('содержимое страницы до добавления: ', book[1], sep ='\n')
+    writer = Writer()
+    writer.write(book, 1, 'some_text')
+    print('Содержимое страницы после добавления:', book[1], sep='\n')
+    
+    #person.write(note, 2, 'too_long_string' * 1000) #toolongtexterror
    
-#     text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
-#     page = PageTableContents(text, 300)
-#     print(page)
-#     print(page.search('February'))
+    text = 'TABLE OF CONTENT\nJanuary:1\nFebruary:33\n'
+    page = PageTableContents(text, 300)
+    print(page)
+    print(page.search('February'))
   
     
-#     book = CalendarBook('1980')
-#     person = AdvancedPerson('Sasha')
-#     print(person.read(book, 'January'))
+    book = CalendarBook('1980')
+    person = AdvancedPerson('Sasha')
+    print(person.read(book, 'January'))
+    book = CalendarBook('2018')
+    tc = calendar.TextCalendar(firstweekday=0)
     
+    # text = 'TABLE OF CONTENT\nJanuary:1\n'
+    # page = PageTableContents(text, 300)
+    # page += "some_string"
     
-#     # text = 'TABLE OF CONTENT\nJanuary:1\n'
-#     # page = PageTableContents(text, 300)
-#     # page += "some_string"
-    
-# main()
+main()
 
 # # # tc= calendar.TextCalendar(firstweekday=0)
 # # print(tc.formatmonth(2018, 1))
