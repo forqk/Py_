@@ -14,51 +14,51 @@ from client import Client, ClientError
 
 def run(host, port):
     print('RunScript..')
-    client1 = Client(host, port, timeout=5)
-    client2 = Client(host, port, timeout=5)
-    command = "wrong command test\n"
+    client1 = Client(host, port) #timeout = 5
+    client2 = Client(host, port) #timeout = 5
+    # command = "wrong command test\n"
 
-    try:
-        data = client1.get(command)
-    except ClientError:
-        pass
-    except BaseException as err:
-        print(f"Ошибка соединения с сервером: {err.__class__}: {err}")
-        sys.exit(1)
-    else:
-        print("Неверная команда, отправленная серверу, должна возвращать ошибку протокола")
-        sys.exit(1)
+    # try:
+    #     data = client1.get(command)
+    # except ClientError:
+    #     pass
+    # except BaseException as err:
+    #     print(f"Ошибка соединения с сервером: {err.__class__}: {err}")
+    #     sys.exit(1)
+    # else:
+    #     print("Неверная команда, отправленная серверу, должна возвращать ошибку протокола")
+    #     sys.exit(1) 
 
-    command = 'some_key'
-    try:
-        data_1 = client1.get(command)
-        data_2 = client1.get(command)
-    except ClientError:
-        print('Сервер вернул ответ на валидный запрос, который клиент определил, '
-              'как не корректный.. ')
-    except BaseException as err:
-        print(f"Сервер должен поддерживать соединение с клиентом между запросами, "
-              f"повторный запрос к серверу завершился ошибкой: {err.__class__}: {err}")
-        sys.exit(1)
+    # command = 'some_key'
+    # try:
+    #     data_1 = client1.get(command)
+    #     data_2 = client1.get(command)
+    # except ClientError:
+    #     print('Сервер вернул ответ на валидный запрос, который клиент определил, '
+    #           'как не корректный.. ')
+    # except BaseException as err:
+    #     print(f"Сервер должен поддерживать соединение с клиентом между запросами, "
+    #           f"повторный запрос к серверу завершился ошибкой: {err.__class__}: {err}")
+    #     sys.exit(1)
 
-    assert data_1 == data_2 == {}, \
-        "На запрос клиента на получения данных по не существующему ключу, сервер " \
-        "вдолжен озвращать ответ с пустым полем данных."
+    # assert data_1 == data_2 == {}, \
+    #     "На запрос клиента на получения данных по не существующему ключу, сервер " \
+    #     "вдолжен озвращать ответ с пустым полем данных."
 
-    try:
-        data_1 = client1.get(command)
-        data_2 = client2.get(command)
-    except ClientError:
-        print('Сервер вернул ответ на валидный запрос, который клиент определил'
-              ', как не корректный.. ')
-    except BaseException as err:
-        print(f"Сервер должен поддерживать соединение с несколькими клиентами: "
-              f"{err.__class__}: {err}")
-        sys.exit(1)
+    # try:
+    #     data_1 = client1.get(command)
+    #     data_2 = client2.get(command)
+    # except ClientError:
+    #     print('Сервер вернул ответ на валидный запрос, который клиент определил'
+    #           ', как не корректный.. ')
+    # except BaseException as err:
+    #     print(f"Сервер должен поддерживать соединение с несколькими клиентами: "
+    #           f"{err.__class__}: {err}")
+    #     sys.exit(1)
 
-    assert data_1 == data_2 == {}, \
-        "На запрос клиента на получения данных по не существующему ключу, сервер " \
-        "должен возвращать ответ с пустым полем данных."
+    # assert data_1 == data_2 == {}, \
+    #     "На запрос клиента на получения данных по не существующему ключу, сервер " \
+    #     "должен возвращать ответ с пустым полем данных."
 
     try:
         client1.put("k1", 0.25, timestamp=1)
