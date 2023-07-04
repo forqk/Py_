@@ -27,19 +27,12 @@ class TestFactorize(unittest.TestCase):
     def est_zero_and_one_cases(self):
         a = (0, )
         b = (1, )
-        with self.subTest(i = 2):
+      #  with self.subTest(i = 2):
             
-        
-        
-        
-            
-            
-    
-        
-        
+              
 def main():
-   # factorize(4)
-    
+    factorize(4)    
     unittest.main()
+    
     
 main()
