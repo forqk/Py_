@@ -9,30 +9,60 @@ def factorize(x):
     :type x: int,>=0
     :rtype: tuple[N],N>0
     """
+    
     a = (x, )
     return a
 
 
-class TestFactorize(unittest.TestCase):
-    def test_usage(self):
-        self.assertEqual(2+2, 4)
-        
+class TestFactorize(unittest.TestCase):        
     def test_wrong_types_raise_exception(self):
-        pass
-        # with self.subTest(i=1):
-        #     self.assertRaises(TypeError, factorize, 'string')
-        # with self.subTest(i=1):
-        #     self.assertRaises(TypeError, factorize, 1.5)
+        cases = ["string", 1.5]   
+        for case in cases:
+            with self.subTest(x=case):
+                self.assertRaises(TypeError, factorize, case)
+    
+        
+    def test_negative(self):
+        cases = [-1, -10, -100]
+        for case in cases:
+                with self.subTest(x=case):
+                    self.assertRaises(ValueError, factorize, case)
+
+    def test_zero_and_one_cases(self):
+        cases = [0, 1]
+        for case in cases:
+            with self.subTest(x=case):
+                self.assertEqual(factorize(case), (case,))
+                    
+    
+    def test_simple_numbers(self):
+        cases = [3, 13, 29]
+        for case in cases:
+            with self.subTest(x=case):
+                self.assertEqual(factorize(case), (case,))
+                
+    def test_two_simple_multipliers(self):
+        cases = [6, 26, 121]
+        expected =[(2,3), (2,13), (11, 11)] 
+        for case, exp in zip(cases, expected):
+             with self.subTest(x=case):
+                 self.assertEqual(factorize(case), exp)
             
-    def est_zero_and_one_cases(self):
-        a = (0, )
-        b = (1, )
-      #  with self.subTest(i = 2):
-            
+    
+    def test_many_multipliers(self):
+        cases = [1001, 9699690]
+        expected = [(7, 11, 13), (2, 3, 5, 7, 11, 13, 17, 19)]
+        for case, exp in zip(cases, expected):
+            with self.subTest(x=case):
+                self.assertEqual(factorize(case), exp)
+        
+ 
               
 def main():
-    factorize(4)    
+   # print(factorize("line"))    
     unittest.main()
+    
+
     
     
 main()
